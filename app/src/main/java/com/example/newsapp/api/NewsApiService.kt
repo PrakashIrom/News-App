@@ -23,6 +23,10 @@ interface NewsApiService {
                         @Query("apiKey") apiKey: String = "4f88f54e7af3443da3baf0153c3d72cf"): ApiResponse
 }
 
+
+//Note: Remember "lazy initialization" is when object creation is purposely delayed, until you actually need that object,
+// to avoid unnecessary computation or use of other computing resources. Kotlin has first-class support for lazy instantiation.
+
 object NewsApi {
     val retrofitService: NewsApiService by lazy {
         retrofit.create(NewsApiService::class.java)//::class.java syntax is used to obtain the Java
