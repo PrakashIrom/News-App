@@ -23,7 +23,7 @@ sealed interface NewsUIState {
 class NewsViewModel: ViewModel(){
 
     var newsUIState: NewsUIState by mutableStateOf(NewsUIState.Loading) // by using 'by' the it delegates the implementation
-    // of newsUIState to another object which is mutableStateOf
+    // of newsUIState to another object which is mutableStateOf ** cannot use '=' sign here **
 
     private val _newsLive = MutableLiveData<ApiResponse>()
     val newsLive: LiveData<ApiResponse> = _newsLive
@@ -35,9 +35,9 @@ class NewsViewModel: ViewModel(){
                     newsUIState = NewsUIState.Success
                 }
                 catch (e: IOException) {
-                    NewsUIState.Error
+                    newsUIState=NewsUIState.Error
                 } catch (e: HttpException) {
-                    NewsUIState.Error
+                    newsUIState=NewsUIState.Error
                 }
         }
     }
