@@ -11,6 +11,8 @@ import retrofit2.http.Query
 
 private const val NEWS_BASE_URL = "https://newsapi.org/v2/"
 
+private val json = Json { coerceInputValues = true }
+
 private val retrofit = Retrofit.Builder()
     .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
     .baseUrl(NEWS_BASE_URL).build()

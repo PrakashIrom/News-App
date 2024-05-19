@@ -8,8 +8,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newsapp.api.NewsApi
+import com.example.newsapp.api.NewsApiService
 import com.example.newsapp.model.ApiResponse
 import com.example.newsapp.model.Article
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -18,26 +21,26 @@ import java.io.IOException
 sealed interface NewsUIState {
     object Loading: NewsUIState
     object Error: NewsUIState
-    object Success: NewsUIState
+    data class Success(val article: List<Article>): NewsUIState
 }
 class NewsViewModel: ViewModel(){
 
-    var newsUIState: NewsUIState by mutableStateOf(NewsUIState.Loading) // by using 'by' the it delegates the implementation
-    // of newsUIState to another object which is mutableStateOf ** cannot use '=' sign here **
-
-    private val _newsLive = MutableLiveData<ApiResponse>()
-    val newsLive: LiveData<ApiResponse> = _newsLive
-    fun getNews(){
+    private val _newsUIState = MutableStateFlow<NewsUIState>(NewsUIState.Loading)
+    val newsUIState: StateFlow<NewsUIState> = _newsUIState
+    init {
+        getNews()
+    }
+    private fun getNews(){
         viewModelScope.launch {
-                try{
+            _newsUIState.value = NewsUIState.Loading
+            _newsUIState.value = try{ // this one is not reinitializing, it is updating the value stored
                     val response = NewsApi.retrofitService.getNews()
-                    _newsLive.value = response// this one is not reinitializing, it is updating the value stored
-                    newsUIState = NewsUIState.Success
+                     NewsUIState.Success(response.articles)
                 }
                 catch (e: IOException) {
-                    newsUIState=NewsUIState.Error
+                    NewsUIState.Error
                 } catch (e: HttpException) {
-                    newsUIState=NewsUIState.Error
+                    NewsUIState.Error
                 }
         }
     }

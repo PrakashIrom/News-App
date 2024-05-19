@@ -32,17 +32,19 @@ fun NewsScreen(modifier:Modifier = Modifier, newsList: List<Article>?){
         mutableStateOf(false)
     }
 
+
     LazyColumn(modifier){
         items(articles){ article->
-
+            NewsList(modifier, article)
             Box(modifier.clickable {
               details=true
             }) {
-                NewsList(modifier, article)
-                Spacer(modifier = modifier.size(10.dp))
-            }
-            if(details){
-                NavHost(modifier,article)
+                if (details) {
+                    NavHost(modifier, article)
+                } else {
+                    NewsList(modifier, article)
+                    Spacer(modifier = modifier.size(10.dp))
+                }
             }
         }
     }
@@ -50,10 +52,18 @@ fun NewsScreen(modifier:Modifier = Modifier, newsList: List<Article>?){
 
 @Composable
 fun NewsList(modifier:Modifier = Modifier, article: Article ){
-        Text(text = article.title)
+        val title = article.title?: "Unknown title"
+        Text(text = title)
         Spacer(modifier = modifier.size(20.dp))
-        AsyncImage(model = article.urlToImage, contentDescription = "News Image")
+    AsyncImage(
+        model = article.urlToImage ?: "", // Use the image URL if not null, otherwise use an empty string
+        contentDescription = "News Image",
+        modifier = Modifier.fillMaxSize(),
+        // You can adjust other parameters like contentScale, crossfade, etc. as needed
+    )
 }
+
+
 
 @Composable
 fun NavHost(modifier: Modifier=Modifier.fillMaxSize(), article: Article){
@@ -63,9 +73,16 @@ fun NavHost(modifier: Modifier=Modifier.fillMaxSize(), article: Article){
 
 @Composable
 fun NewsDetailedScreen(modifier: Modifier = Modifier, article: Article){
-    LazyColumn(){
 
-    }
+    val desc = article.description?:"No Description"
+    val cont = article.content?:"No Content"
+
+            Text(text = desc)
+            Spacer(modifier = modifier.size(10.dp))
+            AsyncImage(model = article.urlToImage ?: "", contentDescription = "News Image")
+            Spacer(modifier = modifier.size(10.dp))
+            Text(text = cont)
+
 }
 
 
