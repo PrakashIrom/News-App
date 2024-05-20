@@ -2,6 +2,7 @@ package com.example.newsapp.mainscreen
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -21,12 +22,13 @@ import java.io.IOException
 sealed interface NewsUIState {
     object Loading: NewsUIState
     object Error: NewsUIState
-    data class Success(val article: List<Article>): NewsUIState
+    data class Success(val articles: List<Article>): NewsUIState
 }
 class NewsViewModel: ViewModel(){
 
     private val _newsUIState = MutableStateFlow<NewsUIState>(NewsUIState.Loading)
     val newsUIState: StateFlow<NewsUIState> = _newsUIState
+
     init {
         getNews()
     }

@@ -16,21 +16,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.newsapp.R
 import com.example.newsapp.model.ApiResponse
 import com.example.newsapp.model.Article
+import com.example.newsapp.navigation.NavApp
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier.fillMaxSize(), viewModel: NewsViewModel = viewModel()) {
 
     val newsUIState by viewModel.newsUIState.collectAsState()
+    val navController = rememberNavController()
 
     when (val current = newsUIState)// we can directly use newsUIState to access Success's property
     {
         is NewsUIState.Loading -> Loading()
         is NewsUIState.Error -> Error()
         is NewsUIState.Success -> {
-            Success(modifier, current.article)
+            NavApp(modifier, current.articles, navController )
         }
     }
 }
@@ -52,10 +56,10 @@ fun Error(modifier: Modifier  = Modifier){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Success(modifier: Modifier = Modifier, article: List<Article>){
+fun Success(modifier: Modifier = Modifier, article: List<Article>,navController: NavController){
     Scaffold (topBar = {
         TopAppBar(title = { Text("News App")})
     }){innerPadding->
-        NewsScreen(modifier.padding(innerPadding), article)
+        NewsScreen(modifier.padding(innerPadding), article,navController)
     }
 }
