@@ -13,10 +13,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,12 +30,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.newsapp.R
 import com.example.newsapp.model.ApiResponse
 import com.example.newsapp.model.Article
 import com.example.newsapp.navigation.NavApp
@@ -75,7 +83,7 @@ fun NewsList(modifier:Modifier = Modifier, article: Article,  onItemClick:(Artic
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun NewsDetailedScreen(modifier: Modifier = Modifier, article: Article) {
+fun NewsDetailedScreen(modifier: Modifier = Modifier, article: Article, navigateUp:()->Unit) {
     val desc = article.description ?: "No Description"
     val cont = article.content ?: "No Content"
     val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
@@ -83,74 +91,94 @@ fun NewsDetailedScreen(modifier: Modifier = Modifier, article: Article) {
     val formattedDate = date?.let {
         SimpleDateFormat("MMM dd, yyyy, HH:mm", Locale.getDefault()).format(it)
     } ?: "Unknown Date"
-
-    LazyColumn(
-        modifier = modifier
-            .padding(16.dp)
-            .fillMaxSize()
-    ) {
-        item {
-            article.urlToImage?.let { imageUrl ->
-                AsyncImage(
-                    model = imageUrl,
-                    contentDescription = "News Image",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    contentScale = ContentScale.Crop
+    
+    
+    Scaffold(
+        topBar = {
+            NewsAppBar(modifier,navigateUp)
+        }
+    ) { innerPadding->
+        LazyColumn(
+            modifier = modifier
+                .padding(16.dp)
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            item {
+                article.urlToImage?.let { imageUrl ->
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = "News Image",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
+            item {
+                Text(
+                    text = article.title ?: "Unknown Title",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                Text(
+                    text = "By ${article.author ?: "Unknown Author"}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                Text(
+                    text = "Source: ${article.source.name}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                Text(
+                    text = formattedDate,
+                    style = MaterialTheme.typography.bodySmall
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
-        }
-        item {
-            Text(
-                text = article.title ?: "Unknown Title",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-        item {
-            Text(
-                text = "By ${article.author ?: "Unknown Author"}",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-        item {
-            Text(
-                text = "Source: ${article.source.name}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-        item {
-            Text(
-                text = formattedDate,
-                style = MaterialTheme.typography.bodySmall
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-        item {
-            Text(
-                text = desc,
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-        item {
-            Text(
-                text = cont,
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-        item {
-            TextButton(onClick = { /* Handle click to open the URL */ }) {
-                Text(text = "Read more", style = MaterialTheme.typography.bodyLarge)
+            item {
+                Text(
+                    text = desc,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            item {
+                Text(
+                    text = cont,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            item {
+                TextButton(onClick = { /* Handle click to open the URL */ }) {
+                    Text(text = "Read more", style = MaterialTheme.typography.bodyLarge)
+                }
             }
         }
+    }
+
+}
+
+
+@Composable
+fun NewsAppBar(modifier: Modifier=Modifier,navigateUp:()->Unit){
+    IconButton(onClick = navigateUp) {
+        Icon(
+            imageVector = Icons.Filled.ArrowBack,
+            contentDescription = "Back Button"
+        )
     }
 }
 
